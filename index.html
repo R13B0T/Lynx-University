@@ -477,7 +477,6 @@ function renderGrid() {
       <div class="lesson-preview">${l.outline}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
         <div class="card-cta" style="color:${col}">View lesson →</div>
-        ${l.vid ? `<a href="https://youtu.be/${l.vid}" target="_blank" onclick="event.stopPropagation()" class="vid-btn" style="background:${col}"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:white;flex-shrink:0"><path d="M8 5v14l11-7z"/></svg>Watch</a>` : ''}
       </div>
     </div>`;
   }).join('');
@@ -487,7 +486,7 @@ function openLesson(id) {
   const course = courseOf(id);
   const lesson = course.lessons.find(l => l.id === id);
   activeLesson = lesson;
-  activeDTab = lesson.vid ? 'video' : 'outline';
+  activeDTab = 'outline';
   document.getElementById('main-view').style.display = 'none';
   document.getElementById('detail-view').style.display = 'block';
   renderDetail();
@@ -507,8 +506,8 @@ function renderDetail() {
       <div class="lesson-hero-title">${l.title}</div>
     </div>
     <div class="detail-tabs" style="--tab-accent:${col}">
-      ${l.vid ? `<button class="detail-tab ${activeDTab==='video'?'active':''}" onclick="setDTab('video')">▶ Watch</button>` : ''}
       <button class="detail-tab ${activeDTab==='outline'?'active':''}" onclick="setDTab('outline')">Outline</button>
+      ${l.vid ? `<button class="detail-tab ${activeDTab==='video'?'active':''}" onclick="setDTab('video')">▶ Watch</button>` : ''}
       <button class="detail-tab ${activeDTab==='practice'?'active':''}" onclick="setDTab('practice')">Practice</button>
     </div>`;
 

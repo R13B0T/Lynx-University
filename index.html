@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LYNX Whiteboard University — ASI Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #213c44;
+    --med: #125960;
+    --light: #109aa9;
+    --amber: #ffa100;
+    --green: #4B954C;
+    --yellow: #f1d336;
+    --bg: #f4f6f7;
+    --surface: #ffffff;
+    --text: #1a2e33;
+    --muted: #5a7177;
+    --border: #dde4e6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  
+  /* Gradient stripe */
+  .gradient-bar { height: 5px; background: linear-gradient(90deg, var(--light) 0%, var(--green) 40%, var(--yellow) 70%, var(--amber) 100%); }
+
+  /* Header */
+  header { background: var(--dark); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+  .logo { display: flex; align-items: center; gap: 16px; }
+  .logo-asi { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 24px; color: var(--light); letter-spacing: 2px; }
+  .logo-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.2); }
+  .logo-text { }
+  .logo-sub { font-size: 9px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--light); line-height: 1; }
+  .logo-title { font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600; color: white; }
+  .header-progress { text-align: right; }
+  .header-progress-label { font-size: 10px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; }
+  .header-progress-count { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 600; color: var(--light); }
+
+  /* Progress bar */
+  .progress-strip { background: var(--med); padding: 10px 32px; display: flex; align-items: center; gap: 16px; }
+  .progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 3px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--light); border-radius: 3px; transition: width 0.5s ease; }
+  .progress-pct { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6); white-space: nowrap; min-width: 80px; text-align: right; }
+
+  /* Course tabs */
+  .course-tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 0; overflow-x: auto; }
+  .course-tab { padding: 14px 20px; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: color 0.15s; }
+  .course-tab:hover { color: var(--text); }
+  .course-tab.active { font-weight: 600; border-bottom-color: var(--tab-color, var(--light)); color: var(--tab-color, var(--light)); }
+  .tab-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .course-tab.active .tab-badge { background: var(--tab-color, var(--light)); color: white; }
+  .course-tab:not(.active) .tab-badge { background: #eef1f2; color: var(--muted); }
+
+  /* Course header */
+  .course-header { padding: 16px 32px; border-bottom: 1px solid var(--border); }
+  .course-header-inner { display: flex; align-items: center; gap: 12px; }
+  .course-color-bar { width: 4px; height: 40px; border-radius: 2px; flex-shrink: 0; }
+  .course-header-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
+  .course-header-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Lesson grid */
+  .lesson-grid { padding: 24px 32px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+  /* Lesson card */
+  .lesson-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; cursor: pointer; transition: transform 0.15s, border-color 0.2s, box-shadow 0.15s; position: relative; }
+  .lesson-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(33,60,68,0.1); }
+  .lesson-card.done { border-color: var(--card-color, var(--light)); }
+  .lesson-card.done::after { content: ''; position: absolute; inset: 0; border-radius: 12px; background: var(--card-color, var(--light)); opacity: 0.05; pointer-events: none; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .lesson-num { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; color: white; letter-spacing: 0.5px; }
+  .check-btn { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; flex-shrink: 0; }
+  .check-btn.done { color: white; }
+  .lesson-title { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.4; }
+  .lesson-preview { font-size: 11px; color: var(--muted); line-height: 1.6; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; margin-bottom: 12px; }
+  .card-cta { font-size: 11px; font-weight: 500; }
+
+  /* Lesson detail */
+  .lesson-detail { display: none; padding: 0 32px 40px; }
+  .lesson-detail.active { display: block; }
+  .back-btn { background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500; padding: 20px 0 16px; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s; }
+  .back-btn:hover { opacity: 0.7; }
+
+  .lesson-hero { border-radius: 14px; padding: 24px 28px; margin-bottom: 20px; }
+  .lesson-hero-num { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; color: white; letter-spacing: 1px; margin-bottom: 12px; }
+  .lesson-hero-title { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: white; line-height: 1.3; }
+
+  .detail-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+  .detail-tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .detail-tab.active { font-weight: 600; color: var(--tab-accent); border-bottom-color: var(--tab-accent); }
+
+  .outline-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; }
+  .outline-box p { font-size: 14px; line-height: 1.9; color: var(--text); }
+
+  .practice-intro { border-left: 3px solid var(--tab-accent); padding: 4px 0 4px 16px; margin-bottom: 20px; }
+  .practice-intro-label { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+  .practice-intro-text { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; margin-bottom: 10px; }
+  .task-title { font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+  .task-list { padding-left: 18px; }
+  .task-list li { font-size: 12px; color: var(--muted); line-height: 1.7; margin-bottom: 4px; }
+
+  .reflection-box { border-radius: 10px; padding: 20px 24px; margin-top: 8px; }
+  .reflection-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+  .reflection-text { font-size: 13px; font-style: italic; line-height: 1.8; }
+
+  .detail-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .footer-back { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); transition: all 0.15s; }
+  .footer-back:hover { border-color: var(--muted); color: var(--text); }
+  .mark-btn { padding: 10px 24px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; border: 1.5px solid; transition: all 0.15s; }
+
+  /* Video */
+  .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 10px; overflow: hidden; margin-bottom: 20px; background: #000; }
+  .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  .vid-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; padding: 5px 12px; border-radius: 20px; color: white; text-decoration: none; margin-top: 10px; }
+  .vid-btn svg { width: 13px; height: 13px; fill: white; flex-shrink: 0; }
+
+  /* Footer */
+  footer { background: var(--dark); padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
+  footer span { font-size: 11px; color: rgba(255,255,255,0.3); }
+
+  @media (max-width: 600px) {
+    header { padding: 0 16px; }
+    .lesson-grid { padding: 16px; grid-template-columns: 1fr; }
+    .lesson-detail { padding: 0 16px 32px; }
+    .course-tabs { padding: 0 16px; }
+    .course-header { padding: 14px 16px; }
+    .progress-strip { padding: 10px 16px; }
+    footer { padding: 16px; flex-direction: column; gap: 6px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="gradient-bar"></div>
+
+<header>
+    <div class="logo">
+    <div class="logo-asi">ASI</div>
+    <div class="logo-divider"></div>
+    <div class="logo-text">
+      <div class="logo-sub">Clevertouch by Boxlight</div>
+      <div class="logo-title">LYNX Whiteboard University</div>
+    </div>
+  </div>
+<div class="header-progress">
+    <div class="header-progress-label">Your progress</div>
+    <div class="header-progress-count" id="hdr-count">0/24 lessons</div>
+  </div>
+</header>
+
+<div class="progress-strip">
+  <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+  <div class="progress-pct" id="prog-pct">0% complete</div>
+</div>
+
+<div id="main-view">
+  <div class="course-tabs" id="course-tabs"></div>
+  <div class="course-header" id="course-header"></div>
+  <div class="lesson-grid" id="lesson-grid"></div>
+</div>
+
+<div id="detail-view" style="display:none">
+  <div class="lesson-detail active" id="lesson-detail"></div>
+</div>
+
+<footer>
+  <span>© ASI Solutions · LYNX Whiteboard University</span>
+  <span>Clevertouch by Boxlight · Education Division</span>
+</footer>
+
+<script>
+const COLORS = { setup: '#109aa9', c1: '#125960', c2: '#ffa100' };
+
+const DATA = [
+  { id: 'setup', label: 'App Setup & SSO', desc: 'Get LYNX installed and your account ready', lessons: [
+    { n:'01', id:'s1', vid:'V_RI1l7aWtU', title:'Download LYNX and create an account',
+      outline:'This lesson walks through the first setup steps for LYNX Whiteboard. It shows where to download the app on tablets, phones, laptops, and desktop devices, and explains when to use an app store compared with the LYNX website. It also demonstrates creating an account through the website so the app can be used across devices. By the end of this lesson, you should understand how to install LYNX correctly and why creating an account is an important part of getting started.',
+      intro:'Get LYNX installed and ready on the device you are most likely to use.',
+      tasks:[
+        {t:'Choose the right download path', items:['Decide whether you are installing on a tablet, phone, laptop, or desktop device.','Go to the correct app store or the LYNX website and confirm you are downloading the official LYNX Whiteboard app.']},
+        {t:'Install the app', items:['Complete the installation on one device and open the app once it finishes.','Check that it launches without errors and that you can see the home screen.']},
+        {t:'Create your account', items:['Go to the LYNX website and create an account using your work details or preferred login method.','Confirm that your account is active and ready to use.']}
+      ],
+      refl:'How could completing this setup before training or teaching reduce delays and stress later?'
+    },
+    { n:'02', id:'s2', vid:'2Vq5-j9LHBA', title:'Create account with SSO',
+      outline:'This lesson focuses on signing in to LYNX Whiteboard using single sign-on with a Google account. It shows the sign-in flow, how permission prompts appear, and how LYNX connects to an existing Google account rather than requiring a separate password. By the end of this lesson, you should feel confident using SSO as a fast and practical way to start using LYNX.',
+      intro:'Sign in the way many staff would in a real school or workplace setup.',
+      tasks:[
+        {t:'Start the sign-in process', items:['Open the LYNX sign-in page on the website.','Select the Google sign-in option and notice you are not asked to create a separate LYNX password.']},
+        {t:'Complete permissions', items:['Choose your work or test Google account and read each permission prompt before accepting.','Finish the sign-in and confirm it returns you to LYNX.']},
+        {t:'Check access', items:['Look for your signed-in name or account details in the interface.','Reopen the app or site to make sure the sign-in holds between sessions.']}
+      ],
+      refl:'How could single sign-on remove setup barriers for staff who want to start teaching with LYNX quickly?'
+    },
+    { n:'03', id:'s3', vid:'c1QgnQrXD60', title:'Linking Drives',
+      outline:'This lesson covers account housekeeping through the LYNX Cloud website, with a focus on linking cloud drives. It shows that some drives may already be linked if they were used to create the account, and demonstrates adding another drive such as OneDrive or Dropbox by working through the permissions process. The key idea is that linking drives makes your files easier to access across devices. By the end of this lesson, you should feel more confident linking a drive and understanding why it matters.',
+      intro:'Connect one cloud location that genuinely matters to your day-to-day work.',
+      tasks:[
+        {t:'Open the web account area', items:['Go to the LYNX Cloud website, sign in, and navigate to the drives area.','Review whether a drive is already linked because of the way your account was created.']},
+        {t:'Add another drive', items:['If relevant, link OneDrive or Dropbox and work through the permission prompts carefully.','Confirm the drive connection completes successfully.']},
+        {t:'Check the result in LYNX', items:['Return to the app and confirm the linked drive is now accessible from the files area.']}
+      ],
+      refl:'How could linked drives make it easier to move between planning on one device and teaching on another?'
+    }
+  ]},
+  { id: 'c1', label: 'Course 1: Essentials', desc: 'Master the core tools for everyday teaching', lessons: [
+    { n:'01', id:'c1l1', vid:'AoF5ytErW6w', title:'Getting Started with LYNX Whiteboard',
+      outline:'This lesson introduces LYNX Whiteboard as both a whiteboarding and presentation app. It explains that LYNX can run across phones, tablets, laptops, Chromebooks, and Clevertouch screens, and it highlights linked drives, file opening, editable notebook imports, media search, and interactive tools such as rulers, protractors, clocks, dice, and compasses. The focus is on understanding the range of what LYNX can do rather than mastering one tool. By the end of this lesson, you should have a clear picture of where LYNX fits into everyday teaching or presenting.',
+      intro:'Explore LYNX as a flexible teaching space rather than just another app to learn.',
+      tasks:[
+        {t:'Open LYNX and identify its purpose', items:['Launch the app on your device and create a blank page.','Name two ways you could use it — for example, presenting a lesson, modelling a concept, or running an interactive activity.']},
+        {t:'Explore what it can bring in', items:['Look for where linked drives or files would be accessed.','Think about one existing file you may want to open in LYNX in a real lesson.']},
+        {t:'Explore built-in possibilities', items:['Find one area that suggests media, interactive tools, or maths resources.','Note one feature that could replace a separate app or website in a lesson you already teach.']}
+      ],
+      refl:'Which part of the LYNX feature set feels most useful for your own teaching or presenting context?'
+    },
+    { n:'02', id:'c1l2', vid:'deDts66pRbg', title:'Welcome to the Dashboard',
+      outline:'This lesson focuses on the LYNX dashboard as the starting point for daily use. It shows what changes once you sign in, how sign-in can use your Google or Microsoft account, and where dashboard shortcuts lead, including the LYNX portal, activities, and recent updates. The lesson also frames the dashboard as the place where you confirm account status and launch into the wider LYNX ecosystem. By the end of this lesson, you should feel confident using the dashboard to begin work and access the main connected areas quickly.',
+      intro:'Use the dashboard to prepare for smoother starts before class or training sessions.',
+      tasks:[
+        {t:'Sign in from the dashboard', items:['Open LYNX Whiteboard and sign in with your Google or Microsoft account.','Confirm that your name and account status appear on the dashboard.']},
+        {t:'Explore the dashboard shortcuts', items:['Locate shortcuts such as the portal, activities, or update areas.','Open one of them so you understand where it leads and what it contains.']},
+        {t:'Create a quick-start habit', items:['Create a new file from the dashboard.','Return to the dashboard and notice how it acts as a launch point for your work.']}
+      ],
+      refl:'How could starting from the dashboard help you begin lessons more calmly and with fewer clicks?'
+    },
+    { n:'03', id:'c1l3', vid:'EqNbmXi97Vc', title:'Opening Files',
+      outline:'This lesson explains what happens when different file types are opened in LYNX Whiteboard. It shows that linked cloud drives and local folders can both be used, and makes clear that Google Docs, Google Slides, Word documents, and PowerPoints open in a PDF-style format, while SMART Notebook and ActivInspire files are more editable. By the end of this lesson, you should understand how to open files confidently and what level of editability to expect from different file types.',
+      intro:'Practise opening real teaching files so you know what to expect before using them live.',
+      tasks:[
+        {t:'Open from a familiar location', items:['Go to the files area in LYNX and open one file from a local folder or linked drive.','Notice the steps needed to bring it into LYNX and how long the process takes.']},
+        {t:'Compare file types', items:['Open a PDF or Word or PowerPoint file and observe how it appears in LYNX.','If available, compare it with a SMART Notebook or ActivInspire file and notice the differences.']},
+        {t:'Plan for classroom use', items:['Choose one file you might use in class and decide whether you need it for display, annotation, or deeper editing.']}
+      ],
+      refl:'How could understanding file behaviour help you avoid surprises when teaching in front of a class?'
+    },
+    { n:'04', id:'c1l4', vid:'WpnFaCwUs-Y', title:'The Main Toolbar',
+      outline:'This lesson introduces the main toolbar at the bottom of the screen and explains how it changes between normal use and presentation mode. It gives a tour of the key areas, including the selector, pen tools, text tools, editing tools, insert options, and page controls. The goal is not to master every feature at once, but to understand how the toolbar is organised so the rest of the app feels easier to navigate. By the end of this lesson, you should feel more confident locating the main tool groups and understanding their purpose.',
+      intro:'Build a practical mental map of the toolbar before relying on it during live teaching.',
+      tasks:[
+        {t:'Identify the major sections', items:['Open a blank LYNX file and look across the bottom toolbar.','Name the broad areas you can see for selecting, writing, editing, inserting, and managing pages.']},
+        {t:'Test one tool from each area', items:['Use a pen, create a text box, open an insert option, and open the page area.','Notice how the toolbar groups the main actions you need within reach.']},
+        {t:'Compare with presentation mode', items:['Enter presentation mode and notice how the toolbar changes or simplifies.']}
+      ],
+      refl:'How could knowing the toolbar layout help you stay fluent and confident while teaching?'
+    },
+    { n:'05', id:'c1l5', vid:'bVZgr_o75mk', title:'Setting Up the App',
+      outline:'This lesson focuses on settings choices you can make using LYNX Whiteboard on a device. It shows how to open the options area from either the dashboard or an open file, and it introduces the five main tabs, including general settings such as updates, account management, language, and interface toggles. The lesson treats setup as a practical way to make the app feel right before you start building content. By the end of this lesson, you should feel more confident adjusting the app to suit your workflow.',
+      intro:'Shape the app around your workflow before building serious lesson content.',
+      tasks:[
+        {t:'Open the options area', items:['Access settings from the dashboard and then again from within an open file.','Notice that both paths lead to the same core options.']},
+        {t:'Review the main tabs', items:['Look through the general tab and at least one other tab.','Identify where updates, account management, language, or interface toggles sit.']},
+        {t:'Make one useful adjustment', items:['Change one setting that would genuinely improve your day-to-day experience with the app.']}
+      ],
+      refl:'How could a few thoughtful setup choices make LYNX easier to use under real classroom pressure?'
+    },
+    { n:'06', id:'c1l6', vid:'of7sJIfZyl4', title:'Floating Toolbars',
+      outline:'This lesson explains why floating toolbars matter in LYNX Whiteboard. It contrasts the simple main toolbar at the bottom of the screen with the object-specific options that appear when you click items on the page. It also notes that different objects can show different bespoke controls, such as extra options for clocks or protractors. The lesson frames floating toolbars as a big part of what makes LYNX intuitive. By the end of this lesson, you should feel more confident using these nearby controls to work more efficiently.',
+      intro:'Use floating toolbars to reduce unnecessary movement and keep your attention on the page.',
+      tasks:[
+        {t:'Trigger a floating toolbar', items:['Select an object such as a shape, image, or maths tool.','Look for the toolbar or options that appear nearby on the page.']},
+        {t:'Make quick changes', items:['Use the floating toolbar to adjust one or two features of the selected object.','If possible, compare a standard object with a specialised one such as a clock or protractor.']},
+        {t:'Compare with the main toolbar', items:['Notice how using the nearby options can reduce the number of steps you need to take.']}
+      ],
+      refl:'How could floating toolbars help you stay more responsive while teaching or presenting live?'
+    },
+    { n:'07', id:'c1l7', vid:'AjNkGABSEBE', title:'Pages Menu',
+      outline:'This lesson covers the pages menu and the full range of settings it contains beyond page size. It shows how to set dimensions using presets such as A4 or custom values and swap orientation, and it introduces the Curtain and Spotlight display tools, Page Layouts for ready-made templates, Infinite Canvas with Radar View for open-ended canvases, the Edit Background layer for colour and grid patterns, and Enable Snapping for aligning objects to the grid. By the end of this lesson, you should feel confident adjusting page-level settings to match any teaching context.',
+      intro:'Use the pages menu to set up a page that matches the way you want to teach or present.',
+      tasks:[
+        {t:'Set page size and orientation', items:['Change the page size using a preset such as A4 and apply it to all pages.','Swap the orientation and notice how it affects your content layout.']},
+        {t:'Try the Curtain and Spotlight', items:['Add content to a page, turn on the Curtain, and practise revealing it gradually.','Switch to the Spotlight, adjust the size, and move it across the page.']},
+        {t:'Explore canvas and background', items:['Turn on Infinite Canvas and move around the page using two fingers or the scroll controls.','Enter the Edit Background layer, add a grid pattern, and exit to see the result.']}
+      ],
+      refl:'How could the Curtain, Spotlight, and background tools change the way you set up a page before teaching?'
+    },
+    { n:'08', id:'c1l8', vid:'1Cl__yHo5mg', title:'Pages Navigation and Slider',
+      outline:'This lesson looks closely at moving between pages and using the slider to manage a presentation. It shows the page count and forward/back arrows for basic navigation, how to open the slider by clicking the page numbers, and how to reorder slides by holding the up-down arrow and dragging. The hamburger menu on each thumbnail adds page management options including insert before or after, delete, copy, paste, duplicate across both layers, and save the page as an image. By the end of this lesson, you should feel more confident navigating quickly through a resource and keeping a lesson organised.',
+      intro:'Use the page slider to manage a short sequence as if you were preparing a real lesson set.',
+      tasks:[
+        {t:'Build a small sequence', items:['Create three pages in a new file and give each a different title or heading.','Open the slider by clicking the page numbers and jump between pages using the thumbnails.']},
+        {t:'Reorder and manage pages', items:['Use the up-down arrow on a thumbnail to pick up a page and move it to a new position.','Open the hamburger menu on a slide, duplicate it, then insert a new page after it.']},
+        {t:'Review lesson flow', items:['Check whether the page order makes sense for teaching your topic.','Save one page as an image and confirm it appears in your Pictures folder.']}
+      ],
+      refl:'How could better control of page order help you adapt a lesson in response to what students need?'
+    },
+    { n:'09', id:'c1l9', vid:'W5Y750YqfKo', title:'Textboxes',
+      outline:'This lesson introduces text boxes and explains that they draw on default font settings already chosen in the app. It shows how to place a text box, type into it, and work with the related settings that control default fonts and text behaviour. The focus is not only on getting words onto the screen, but on understanding that text can be standardised and adjusted through app settings as well as on-page controls. By the end of this lesson, you should feel more confident creating and managing text in a consistent way.',
+      intro:'Use text boxes to create clear labels and prompts rather than large blocks of text.',
+      tasks:[
+        {t:'Add simple text', items:['Select the text tool and click on the page to create a text box.','Type a heading and a short instruction or question.']},
+        {t:'Notice the default text style', items:['Open the text tool again and identify the default font choices shown there.','Look in the app font settings and note what is currently set as the default.']},
+        {t:'Use text with purpose', items:['Create one page with a heading, a key word, and one short question for students.']}
+      ],
+      refl:'What one habit around font choice, size, or amount of text would you change after this lesson?'
+    },
+    { n:'10', id:'c1l10', vid:'4OBDb7O2j70', title:'Pen Tools',
+      outline:'This lesson explores the pen tools available in LYNX Whiteboard and shows that users can save preferred default pens through the options area. It introduces the pen menu, custom pen choices, and the idea of setting up a personal pen profile for each user of a device. The emphasis is on using pens deliberately for explanation and emphasis rather than random decoration. By the end of this lesson, you should feel more confident choosing and preparing pen tools that suit your own teaching style.',
+      intro:'Use pen tools to support explanation, emphasis, and visual clarity.',
+      tasks:[
+        {t:'Explore the pen menu', items:['Open the pen icon from the main toolbar and test at least two pen options.','Write a short sentence and compare how each pen feels on the page.']},
+        {t:'Review your default pens', items:['Open the options area and look at where default pen choices are set.','Check whether the current defaults suit the way you teach and annotate.']},
+        {t:'Apply pens with purpose', items:['Use one pen for normal writing and another for emphasis, such as a highlighter or coloured marker.']}
+      ],
+      refl:'How could choosing the right pen at the right moment help students focus on what matters most?'
+    },
+    { n:'11', id:'c1l11', vid:'eoTIAgghYII', title:'Insert, Browse and Paste',
+      outline:'This lesson introduces the insert area and explains that it contains several different tools, with this lesson focusing on browse and paste. It shows how the insert menu acts as a bridge between your page and outside content, and it highlights that different insert tools behave in different ways. By the end of this lesson, you should feel more confident using browse and paste as two distinct and practical approaches to bringing content into LYNX.',
+      intro:'Practise bringing outside resources into LYNX in ways that match how you want to use them.',
+      tasks:[
+        {t:'Open the insert area', items:['Locate the insert button on the toolbar and open the menu.','Identify where browse and paste sit within the insert options.']},
+        {t:'Use browse', items:['Browse to a file from a folder or linked drive and insert it.','Observe how it appears on the page and whether it is editable.']},
+        {t:'Use paste', items:['Copy a short piece of text or an image from another source and paste it into LYNX.','Compare the result with what happened when you used browse.']}
+      ],
+      refl:'How could knowing the difference between browse and paste help you build cleaner and more deliberate lesson pages?'
+    },
+    { n:'12', id:'c1l12', vid:'4eFMgk_gg2g', title:'Content Area',
+      outline:'This lesson explores the content area and shows how it can be opened from Insert, moved around the page, resized, and used to access both built-in folders and your own content folders. It explains that the content area sits alongside media and AI tools, and it frames this space as a dependable source of reusable classroom resources. By the end of this lesson, you should feel more confident using the content area to find offline materials and organise resources you want available inside LYNX.',
+      intro:'Use the content area to find resources that support teaching without leaving the app.',
+      tasks:[
+        {t:'Open and position the content area', items:['Go to Insert and open the content area.','Move and resize the content box so it does not block your working space on the page.']},
+        {t:'Browse the folders', items:['Explore at least two built-in folders.','Notice whether you can also add or access your own content folders from this panel.']},
+        {t:'Insert one useful item', items:['Choose one content item and place it on a page.','Add a short label or question beside it to give it instructional purpose.']}
+      ],
+      refl:'How could ready-made offline resources help you plan more efficiently and teach with fewer interruptions?'
+    },
+    { n:'13', id:'c1l13', vid:'VnDm2m0sMew', title:'Media Search',
+      outline:'This lesson focuses on the built-in media search tool and how it can be opened, moved, resized, and used to search through different websites. It explains that you choose a source first, then search for media to bring into the page. The lesson is about finding useful visual content inside LYNX rather than leaving the app to search elsewhere. By the end of this lesson, you should feel more confident using the media search box to gather and place relevant media quickly.',
+      intro:'Use media search to gather one or two strong visuals rather than filling the page with too much content.',
+      tasks:[
+        {t:'Open and position media search', items:['Go to Insert and open the media tool.','Move and resize the media box so it does not block your workspace.']},
+        {t:'Search from one source', items:['Choose one of the available websites and search for an image linked to an upcoming lesson topic.','Insert one result onto the page.']},
+        {t:'Refine the page', items:['Resize or reposition the media item so it fits the page well.','Add a short label or annotation beside it.']}
+      ],
+      refl:'How could finding media inside LYNX save time while still keeping your lesson design purposeful?'
+    },
+    { n:'14', id:'c1l14', vid:'c_ymVnKCd4w', title:'Maths Tools',
+      outline:'This lesson introduces the maths tools found in the offline content area. It shows that the maths folder includes interactive tools such as clocks, along with backgrounds and counters that can be dragged into a page. The lesson frames these tools as practical classroom supports that can be used without needing to switch to a separate website. By the end of this lesson, you should feel more confident locating the maths folder and choosing tools that support modelling, explanation, and interaction.',
+      intro:'Use one maths tool to support explanation of a concept you actually teach.',
+      tasks:[
+        {t:'Locate the maths tools', items:['Open Insert, go to Content, and find the offline maths folder.','Scan the interactive tools, backgrounds, and counters available there.']},
+        {t:'Place one tool on the page', items:['Insert a tool such as a clock or another interactive maths item.','Move it around the page and test how it responds to interaction.']},
+        {t:'Build a quick activity', items:['Add one short instruction beside the tool so it is ready for use in live modelling.']}
+      ],
+      refl:'How could built-in maths tools reduce the need to switch between separate apps or websites during a lesson?'
+    },
+    { n:'15', id:'c1l15', vid:'ILOyWeay_qw', title:'Shapes',
+      outline:'This lesson focuses on inserting shapes quickly from the insert menu. It shows the default set of shape choices, the current fill colour, and an important workflow point: after drawing a shape, you need to return to the selector if you want to move or adjust it rather than keep drawing more shapes. The lesson presents shapes as fast, practical building blocks for diagrams and sorting tasks. By the end of this lesson, you should feel more confident inserting and then managing shapes efficiently.',
+      intro:'Use shapes to organise thinking and create a clearer visual layout for students.',
+      tasks:[
+        {t:'Insert basic shapes', items:['Open Insert and choose Shapes.','Draw at least three different shapes on the page and notice the current fill colour.']},
+        {t:'Switch back to the selector', items:['After drawing a shape, return to the selector before trying to move or resize it.','Notice what happens if you stay in the shape tool and keep clicking on the page.']},
+        {t:'Build one teaching visual', items:['Create a quick sorting chart or labelled diagram using shapes only — no text boxes needed.']}
+      ],
+      refl:'How could shapes help you make ideas more visible and easier for students to organise and interact with?'
+    }
+  ]},
+  { id: 'c2', label: 'Course 2: Purposeful Classroom Use', desc: 'Build interactive and dynamic lesson pages', lessons: [
+    { n:'01', id:'c2l1', vid:'LbKoC8UqOcc', title:'Background Layer',
+      outline:'This lesson explains the difference between the normal layer and the background layer. It shows that items placed in the background cannot be selected in the same way as normal layer items, which makes them useful when you want page elements to stay fixed while students interact with other content. The lesson frames the background layer as a way to protect structure and reduce accidental movement. By the end of this lesson, you should feel more confident deciding what belongs in the background and what should remain interactive.',
+      intro:'Use the background layer to separate fixed structure from movable teaching content.',
+      tasks:[
+        {t:'Compare the two layers', items:['Create one text box or object in the normal layer and test that it can be selected and moved.','Place another item into the background layer and test the difference in how it behaves.']},
+        {t:'Build on top of the background', items:['Add a movable item in the normal layer over the top of a background item.','Check that the background stays fixed while the top item remains editable.']},
+        {t:'Plan a classroom use', items:['Think of one activity where a fixed background would make student interaction cleaner and safer.']}
+      ],
+      refl:'How could fixed background elements make classroom interaction cleaner and reduce accidental disruption?'
+    },
+    { n:'02', id:'c2l2', vid:'bthZVsj6iLU', title:'Editing Tools',
+      outline:'This lesson focuses on the editing tools found under the paint pot icon. It introduces the fill tool with colour options including hex codes, colour wheel, and pipette, plus a transparency option for punching see-through holes in shapes, and the Block Highlighter which can colour-code content or act as a reading filter for students who find plain backgrounds difficult. It also covers four crop tools: Grab Rectangle and Grab Freehand for copying selections from the page, Shape Split for dividing shapes into fractions or table grids, and the Knife for slicing across objects. By the end of this lesson, you should feel more confident using editing tools to refine objects after they are placed on the page.',
+      intro:'Use editing tools to refine existing objects so they better support the task you are teaching.',
+      tasks:[
+        {t:'Fill and Block Highlighter', items:['Insert a shape, open the paint pot, and apply a fill colour using the colour wheel.','Place a Block Highlighter over a section of text and adjust its opacity from the floating toolbar.']},
+        {t:'Grab tools', items:['Use Grab Rectangle to copy part of an image already on the page.','Try Grab Freehand around an irregular shape and compare how each result behaves.']},
+        {t:'Shape Split and Knife', items:['Draw a rectangle and use Shape Split to divide it into rows and columns.','Use the Knife to slice a portion off an object and notice what remains.']}
+      ],
+      refl:'How could the crop and cut tools save you time when adapting existing resources rather than building from scratch?'
+    },
+    { n:'03', id:'c2l3', vid:'eHENCs06-oQ', title:'Insert Tables',
+      outline:'This lesson explains how to insert a table from the Insert menu and use it to build a simple sorting activity. It shows that you decide the table size first by choosing how many cells you need, then place and use the table as a structure for content. The lesson treats tables as active organisers for learning tasks rather than just places to display information. By the end of this lesson, you should feel more confident creating tables that support sorting, matching, and structured thinking.',
+      intro:'Use a table to organise content into a learning task rather than just display information.',
+      tasks:[
+        {t:'Insert a table', items:['Open Insert and choose Table.','Create a table size that suits a real task, such as a sort, ranking, or comparison.']},
+        {t:'Add content to cells', items:['Type labels or headings into some cells.','Place simple objects or images into cells if your version of LYNX allows it.']},
+        {t:'Build a classroom example', items:['Create a small sorting, comparison, or matching task using real subject content you teach.']}
+      ],
+      refl:'How could tables help students organise ideas more clearly during whole-class or small-group activities?'
+    },
+    { n:'04', id:'c2l4', vid:'NJGNnwRIMFg', title:'Links and Flow Windows',
+      outline:'This lesson shows how to create links and flow windows between pages. It begins by stressing page preparation first, including deciding what information should remain visible and what should be hidden in preview. The lesson then uses links and flow windows to control how information is revealed across pages. The focus is on designing smoother movement through a resource, not just creating jumps. By the end of this lesson, you should feel more confident building linked page sequences that reveal information in a deliberate way.',
+      intro:'Use links to build a page sequence that feels more interactive and easier to navigate.',
+      tasks:[
+        {t:'Prepare two or three pages', items:['Create a short set of pages in one file and decide which content should stay visible.','Hide one item in preview if that suits your version and lesson idea.']},
+        {t:'Add a link', items:['Insert a shape or object and link it to another page in the file.','Test that the link works as expected when you tap or click it.']},
+        {t:'Explore a flow window', items:['If available, set one linked item to display in a flow window rather than jumping fully away.','Compare how that feels compared with direct full-page navigation.']}
+      ],
+      refl:'How could linked pages and flow windows help you reveal information in smaller, more manageable steps for students?'
+    },
+    { n:'05', id:'c2l5', vid:'f8tPH8wbzO8', title:'Presentation Mode',
+      outline:'This lesson focuses on preparing objects for presentation mode so pages become interactive during live teaching. It demonstrates adding covers for staged reveals, turning objects into replicators or making them editable while presenting, stacking images to cycle on tap, and creating hyperlinks to sound files, websites, or other pages. It also covers the annotation tools available during a session — pen, highlighter, laser pen, and eraser — plus the Curtain and Spotlight, and how to save or discard changes on exit. By the end of this lesson, you should feel confident designing pages that reveal information deliberately and support live interaction.',
+      intro:'Prepare one page for live delivery so that presentation mode supports the lesson rather than simply hiding menus.',
+      tasks:[
+        {t:'Add a cover and an interactive object', items:['Select an object and add a cover, choosing a colour and splitting it into sections.','Make a second object editable while presenting, or turn it into a replicator.']},
+        {t:'Create a hyperlink', items:['Link one object to another page in the file, or to a sound file or website.','Check that the chain link indicator appears on the object to confirm the link is set.']},
+        {t:'Deliver the page and annotate', items:['Enter presentation mode, reveal your cover, and write a note using an annotation pen.','Stop presenting and choose whether to keep or discard your session changes.']}
+      ],
+      refl:'Which two or three preparation features from this lesson would make the biggest difference to a lesson you already teach?'
+    },
+    { n:'06', id:'c2l6', vid:'nBLAOJP5iHU', title:'Image Options',
+      outline:'This lesson focuses on the options available once an image is already on the page. It shows that images can trigger extra controls, including zooming into an image, opening image-specific options, and, for LYNX Pro users, using AI to search for similar images or generate alternatives. The lesson frames images as workable objects rather than static decorations. By the end of this lesson, you should feel more confident using image options to inspect, adjust, and extend the visual material in your presentation.',
+      intro:'Use image options to make a visual more instructionally useful rather than simply dropping it onto the page.',
+      tasks:[
+        {t:'Insert one image', items:['Add an image using media search, browse, or paste.','Select it so the image-specific options appear in the floating toolbar.']},
+        {t:'Test image actions', items:['Use the enter or zoom option to look more closely at the image.','If you have LYNX Pro, test the AI option to find similar or related images.']},
+        {t:'Use the image in context', items:['Add a short label, arrow, or question beside the image so it becomes part of a teaching prompt.']}
+      ],
+      refl:'How could better image handling improve the way students interpret and discuss visual information in lessons?'
+    }
+  ]}
+];
+
+// State
+let activeTab = 'setup';
+let activeLesson = null;
+let activeDTab = 'outline';
+const done = JSON.parse(localStorage.getItem('lynx_done') || '{}');
+
+function saveDone() { localStorage.setItem('lynx_done', JSON.stringify(done)); }
+function total() { return DATA.reduce((s,c) => s + c.lessons.length, 0); }
+function doneCount() { return Object.values(done).filter(Boolean).length; }
+function courseOf(lid) { return DATA.find(c => c.lessons.some(l => l.id === lid)); }
+
+function updateProgress() {
+  const d = doneCount(), t = total(), p = Math.round(d/t*100);
+  document.getElementById('hdr-count').textContent = d + '/' + t + ' lessons';
+  document.getElementById('prog-fill').style.width = p + '%';
+  document.getElementById('prog-pct').textContent = p + '% complete';
+}
+
+function renderTabs() {
+  const course = DATA.find(c => c.id === activeTab);
+  const col = COLORS[activeTab];
+  const el = document.getElementById('course-tabs');
+  el.innerHTML = DATA.map(c => {
+    const cd = c.lessons.filter(l => done[l.id]).length;
+    const act = c.id === activeTab;
+    return `<button class="course-tab ${act ? 'active' : ''}" style="--tab-color:${COLORS[c.id]}" onclick="setTab('${c.id}')">
+      ${c.label}
+      <span class="tab-badge">${cd}/${c.lessons.length}</span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('course-header').innerHTML = `
+    <div class="course-header-inner">
+      <div class="course-color-bar" style="background:${col}"></div>
+      <div>
+        <div class="course-header-title">${course.label}</div>
+        <div class="course-header-desc">${course.desc}</div>
+      </div>
+    </div>`;
+}
+
+function renderGrid() {
+  const course = DATA.find(c => c.id === activeTab);
+  const col = COLORS[activeTab];
+  document.getElementById('lesson-grid').innerHTML = course.lessons.map(l => {
+    const isDone = !!done[l.id];
+    return `<div class="lesson-card ${isDone ? 'done' : ''}" style="--card-color:${col}" onclick="openLesson('${l.id}')">
+      <div class="card-top">
+        <span class="lesson-num" style="background:${col}">Lesson ${l.n}</span>
+        <button class="check-btn ${isDone ? 'done' : ''}" style="${isDone ? `background:${col};border-color:${col}` : `border-color:#ccd5d8`}" onclick="event.stopPropagation();toggleDone('${l.id}')">${isDone ? '✓' : ''}</button>
+      </div>
+      <div class="lesson-title">${l.title}</div>
+      <div class="lesson-preview">${l.outline}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+        <div class="card-cta" style="color:${col}">View lesson →</div>
+        ${l.vid ? `<a href="https://youtu.be/${l.vid}" target="_blank" onclick="event.stopPropagation()" class="vid-btn" style="background:${col}"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:white;flex-shrink:0"><path d="M8 5v14l11-7z"/></svg>Watch</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openLesson(id) {
+  const course = courseOf(id);
+  const lesson = course.lessons.find(l => l.id === id);
+  activeLesson = lesson;
+  activeDTab = lesson.vid ? 'video' : 'outline';
+  document.getElementById('main-view').style.display = 'none';
+  document.getElementById('detail-view').style.display = 'block';
+  renderDetail();
+  window.scrollTo(0,0);
+}
+
+function renderDetail() {
+  const l = activeLesson;
+  const course = courseOf(l.id);
+  const col = COLORS[course.id];
+  const isDone = !!done[l.id];
+
+  let content = `
+    <button class="back-btn" style="color:${col}" onclick="goBack()">← Back to ${course.label}</button>
+    <div class="lesson-hero" style="background:${col}">
+      <span class="lesson-hero-num" style="background:rgba(255,255,255,0.25)">Lesson ${l.n}</span>
+      <div class="lesson-hero-title">${l.title}</div>
+    </div>
+    <div class="detail-tabs" style="--tab-accent:${col}">
+      ${l.vid ? `<button class="detail-tab ${activeDTab==='video'?'active':''}" onclick="setDTab('video')">▶ Watch</button>` : ''}
+      <button class="detail-tab ${activeDTab==='outline'?'active':''}" onclick="setDTab('outline')">Outline</button>
+      <button class="detail-tab ${activeDTab==='practice'?'active':''}" onclick="setDTab('practice')">Practice</button>
+    </div>`;
+
+  if (activeDTab === 'video' && l.vid) {
+    content += `<div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${l.vid}?rel=0&modestbranding=1&playsinline=1" allowfullscreen></iframe></div>
+    <div style="text-align:right;margin-bottom:8px"><a href="https://youtu.be/${l.vid}" target="_blank" style="font-size:11px;color:${col}">Open on YouTube ↗</a></div>`;
+  } else if (activeDTab === 'outline') {
+    content += `<div class="outline-box"><p>${l.outline}</p></div>`;
+  } else {
+    content += `
+      <div class="practice-intro" style="border-color:${col}">
+        <div class="practice-intro-label" style="color:${col}">Try this in your classroom or planning time</div>
+        <div class="practice-intro-text">${l.intro}</div>
+      </div>`;
+    l.tasks.forEach((tk, i) => {
+      content += `<div class="task-card">
+        <div class="task-title">Task ${i+1}: ${tk.t}</div>
+        <ul class="task-list">${tk.items.map(b => `<li>${b}</li>`).join('')}</ul>
+      </div>`;
+    });
+    content += `<div class="reflection-box" style="background:${col}12;border:1px solid ${col}35">
+      <div class="reflection-label" style="color:${col}">Reflection</div>
+      <div class="reflection-text">${l.refl}</div>
+    </div>`;
+  }
+
+  content += `<div class="detail-footer">
+    <button class="footer-back" onclick="goBack()">← Back to lessons</button>
+    <button class="mark-btn" style="border-color:${col};background:${isDone?col:'transparent'};color:${isDone?'white':col}" onclick="toggleDone('${l.id}')">
+      ${isDone ? '✓ Completed' : 'Mark as complete'}
+    </button>
+  </div>`;
+
+  document.getElementById('lesson-detail').innerHTML = content;
+}
+
+function goBack() {
+  activeLesson = null;
+  document.getElementById('main-view').style.display = 'block';
+  document.getElementById('detail-view').style.display = 'none';
+  renderTabs();
+  renderGrid();
+}
+
+function setTab(id) {
+  activeTab = id;
+  renderTabs();
+  renderGrid();
+}
+
+function setDTab(t) {
+  activeDTab = t;
+  renderDetail();
+}
+
+function toggleDone(id) {
+  done[id] = !done[id];
+  saveDone();
+  updateProgress();
+  if (activeLesson && activeLesson.id === id) {
+    renderDetail();
+  } else {
+    renderGrid();
+    renderTabs();
+  }
+}
+
+// Init
+renderTabs();
+renderGrid();
+updateProgress();
+</script>
+</body>
+</html>

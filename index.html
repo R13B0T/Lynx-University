@@ -20,6 +20,7 @@
     --border: #dde4e6;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  :focus-visible { outline: 2px solid var(--light); outline-offset: 2px; }
   body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
   
   /* Gradient stripe */
@@ -44,8 +45,9 @@
   .progress-pct { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.6); white-space: nowrap; min-width: 80px; text-align: right; }
 
   /* Course tabs */
-  .course-tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 0; overflow-x: auto; }
-  .course-tab { padding: 14px 20px; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: color 0.15s; }
+  .course-tabs { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 32px; display: flex; gap: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; scrollbar-width: none; }
+  .course-tabs::-webkit-scrollbar { display: none; }
+  .course-tab { padding: 14px 20px; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; white-space: nowrap; display: flex; align-items: center; gap: 8px; transition: color 0.15s; scroll-snap-align: start; }
   .course-tab:hover { color: var(--text); }
   .course-tab.active { font-weight: 600; border-bottom-color: var(--tab-color, var(--light)); color: var(--tab-color, var(--light)); }
   .tab-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
@@ -56,7 +58,7 @@
   .course-header { padding: 16px 32px; border-bottom: 1px solid var(--border); }
   .course-header-inner { display: flex; align-items: center; gap: 12px; }
   .course-color-bar { width: 4px; height: 40px; border-radius: 2px; flex-shrink: 0; }
-  .course-header-title { font-family: 'Poppins', sans-serif; font-size: 16px; font-weight: 600; color: var(--text); }
+  .course-header-title { font-family: 'Poppins', sans-serif; font-size: clamp(14px, 2.5vw, 16px); font-weight: 600; color: var(--text); }
   .course-header-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
   /* Lesson grid */
@@ -83,7 +85,7 @@
 
   .lesson-hero { border-radius: 14px; padding: 24px 28px; margin-bottom: 20px; }
   .lesson-hero-num { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; color: white; letter-spacing: 1px; margin-bottom: 12px; }
-  .lesson-hero-title { font-family: 'Poppins', sans-serif; font-size: 20px; font-weight: 700; color: white; line-height: 1.3; }
+  .lesson-hero-title { font-family: 'Poppins', sans-serif; font-size: clamp(16px, 4vw, 22px); font-weight: 700; color: white; line-height: 1.3; }
 
   .detail-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
   .detail-tab { padding: 10px 20px; border: none; background: none; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
@@ -105,7 +107,7 @@
   .reflection-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
   .reflection-text { font-size: 13px; font-style: italic; line-height: 1.8; }
 
-  .detail-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .detail-footer { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
   .footer-back { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 9px 18px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--muted); transition: all 0.15s; }
   .footer-back:hover { border-color: var(--muted); color: var(--text); }
   .mark-btn { padding: 10px 24px; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; border: 1.5px solid; transition: all 0.15s; }
@@ -120,6 +122,13 @@
   footer { background: var(--dark); padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; margin-top: 32px; }
   footer span { font-size: 11px; color: rgba(255,255,255,0.3); }
 
+  @media (max-width: 768px) {
+    .lesson-grid { padding: 20px 24px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+    .lesson-detail { padding: 0 24px 36px; }
+    .course-tabs { padding: 0 24px; }
+    .course-header { padding: 14px 24px; }
+    .progress-strip { padding: 10px 24px; }
+  }
   @media (max-width: 600px) {
     header { padding: 0 16px; }
     .lesson-grid { padding: 16px; grid-template-columns: 1fr; }
@@ -128,6 +137,13 @@
     .course-header { padding: 14px 16px; }
     .progress-strip { padding: 10px 16px; }
     footer { padding: 16px; flex-direction: column; gap: 6px; text-align: center; }
+  }
+  @media (max-width: 400px) {
+    .detail-footer { flex-direction: column; align-items: stretch; }
+    .mark-btn, .footer-back { width: 100%; text-align: center; }
+  }
+  @media (min-width: 1100px) {
+    .lesson-detail { max-width: 860px; margin: 0 auto; }
   }
 </style>
 </head>
@@ -471,7 +487,7 @@ function renderGrid() {
     return `<div class="lesson-card ${isDone ? 'done' : ''}" style="--card-color:${col}" onclick="openLesson('${l.id}')">
       <div class="card-top">
         <span class="lesson-num" style="background:${col}">Lesson ${l.n}</span>
-        <button class="check-btn ${isDone ? 'done' : ''}" style="${isDone ? `background:${col};border-color:${col}` : `border-color:#ccd5d8`}" onclick="event.stopPropagation();toggleDone('${l.id}')">${isDone ? '✓' : ''}</button>
+        <button class="check-btn ${isDone ? 'done' : ''}" style="${isDone ? `background:${col};border-color:${col}` : `border-color:#ccd5d8`}" onclick="event.stopPropagation();toggleDone('${l.id}')" aria-label="${isDone ? 'Mark as incomplete' : 'Mark as complete'}" aria-pressed="${isDone}">${isDone ? '✓' : ''}</button>
       </div>
       <div class="lesson-title">${l.title}</div>
       <div class="lesson-preview">${l.outline}</div>
@@ -512,8 +528,8 @@ function renderDetail() {
     </div>`;
 
   if (activeDTab === 'video' && l.vid) {
-    content += `<div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${l.vid}?rel=0&modestbranding=1&playsinline=1" allowfullscreen></iframe></div>
-    <div style="text-align:right;margin-bottom:8px"><a href="https://youtu.be/${l.vid}" target="_blank" style="font-size:11px;color:${col}">Open on YouTube ↗</a></div>`;
+    content += `<div class="video-wrap"><iframe src="https://www.youtube-nocookie.com/embed/${l.vid}?rel=0&modestbranding=1&playsinline=1" allowfullscreen loading="lazy" title="${l.title} — Lesson Video" sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"></iframe></div>
+    <div style="text-align:right;margin-bottom:8px"><a href="https://youtu.be/${l.vid}" target="_blank" class="vid-btn" style="background:${col}"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>Open on YouTube</a></div>`;
   } else if (activeDTab === 'outline') {
     content += `<div class="outline-box"><p>${l.outline}</p></div>`;
   } else {
@@ -536,7 +552,7 @@ function renderDetail() {
 
   content += `<div class="detail-footer">
     <button class="footer-back" onclick="goBack()">← Back to lessons</button>
-    <button class="mark-btn" style="border-color:${col};background:${isDone?col:'transparent'};color:${isDone?'white':col}" onclick="toggleDone('${l.id}')">
+    <button class="mark-btn" style="border-color:${col};background:${isDone?col:'transparent'};color:${isDone?'white':col}" onclick="toggleDone('${l.id}')" aria-pressed="${isDone}">
       ${isDone ? '✓ Completed' : 'Mark as complete'}
     </button>
   </div>`;
